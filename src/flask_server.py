@@ -62,7 +62,7 @@ class GetFullDataset(Resource):
 class GetSpecificDate(Resource):
     
     @app.doc(responses={ 200: 'OK', 500: 'Requested data was not found.' }, 
-			 params={ 'date': 'Specify the date in the format dd/mm/yyyy' })
+			 params={ 'date': 'Specify the date in the format dd-mm-yyyy' })
     def get(self, date):
         """ Returns the update of a specific date
 
@@ -96,8 +96,8 @@ class GetSpecificDate(Resource):
 class GetRangeOfDates(Resource):
     
     @app.doc(responses={ 200: 'OK', 500: 'At least one of the dates was not found.' }, 
-			 params={ 'date_1': 'Specify the first date in the format dd/mm/yyyy',
-                      'date_2': 'Specify the first date in the format dd/mm/yyyy',})
+			 params={ 'date_1': 'Specify the first date in the format dd-mm-yyyy',
+                      'date_2': 'Specify the first date in the format dd-mm-yyyy',})
     def get(self, date_1, date_2):
         """ Returns the updates for a specific range of dates
 
