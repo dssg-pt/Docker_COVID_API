@@ -1,3 +1,5 @@
 flask
+flask-restplus
 pandas
 numpy
+werkzeug==0.16.1

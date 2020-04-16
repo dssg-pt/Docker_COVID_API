@@ -2,74 +2,111 @@ import pandas as pd
 
 # Get last update 
 from flask import Flask
-from flask import abort, make_response
+from flask import abort, make_response, request
+from flask_restplus import Api, Resource, fields
 
-app = Flask(__name__)
+flask_app = Flask(__name__)
+app = Api(app = flask_app,
+          version = "1.0", 
+		  title = "COVID-19 REST API Portugal", 
+		  description = "DSSG Portugal / VOST REST API para fazer Download dos dados da DGS correspondentes ao COVID-19")
 
-@app.route('/get_full_dataset', methods=['GET'])
-def get_full_dataset():
-    """ Returns full dataset
-    """    
+name_space = app.namespace('Requests', description='Request disponíveis até à data')
 
-    url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data.csv'
+@name_space.route('/get_last_update')
+class GetLastUpdate(Resource):
+
+    def get(self):
+        """ Retorna o último update do dataset em formato JSON.
+
+            Retorna um dicionário em formato JSON do tipo: {index -> {column -> value}}
+
+        """
+        url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data.csv'
+        df = pd.read_csv(url, error_bad_lines=False)
+        last_date = df.iloc[-1]
+        return last_date.to_json()
+
+
+@name_space.route('/get_full_dataset')
+class GetFullDataset(Resource):
+
+    def get(self):
+        """ Retorna o dataset inteiro em formato JSON.
+
+            Retorna um dicionário em formato JSON do tipo: {index -> {column -> value}}
+
+        """
+        
+        url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data.csv'
+        df = pd.read_csv(url, error_bad_lines=False)
+        return df.to_json()
+
+@name_space.route('/get_entry/<string:date>')
+class GetSpecificDate(Resource):
     
-    df = pd.read_csv(url, error_bad_lines=False)
+    @app.doc(responses={ 200: 'OK', 500: 'Data Não encontrada no dataset' }, 
+			 params={ 'date': 'Especifica a data desejada no formato dd/mm/yyyy' })
+    def get(self, date):
+        """ Retorna o update para uma data específica
 
-    return df.to_json()
+            Deve ser feito no formato dia-mês-ano. Por exemplo /get_entry/01-04-2020
 
-@app.route('/get_last_update')
-def get_last_update():
-    """ Returns last update of the dataset
-    """    
-    url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data.csv'
-    df = pd.read_csv(url, error_bad_lines=False)
-    last_date = df.iloc[-1]
-    return last_date.to_json()
+            Retorna um dicionário em formato JSON do tipo: {index -> {column -> value}}
 
-@app.route('/get_entry/<string:date>', methods=['GET'])
-def get_date_entry(date):
-    """ Returns entry from a specific date
-    """    
-    url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data.csv'
+        """    
+
+        url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data.csv'
+        
+        df = pd.read_csv(url, error_bad_lines=False)
+        
+        entry_of_interest = df.loc[df.data == date]
+
+        if entry_of_interest.shape[0] == 0:
+            name_space.abort(500, status = "Data Não encontrada no dataset", statusCode = "500")
+
+        return entry_of_interest.to_json()
+
+@name_space.route('/get_entry/<string:date_1>_until_<string:date_2>')
+class GetRangeOfDates(Resource):
     
-    df = pd.read_csv(url, error_bad_lines=False)
-    
-    entry_of_interest = df.loc[df.data == date]
+    @app.doc(responses={ 200: 'OK', 500: 'Pelo menos uma das datas não foi encontrada no dataset' }, 
+			 params={ 'date_1': 'Especifica a primeira data desejada no formato dd/mm/yyyy',
+                      'date_2': 'Especifica a primeira data desejada no formato dd/mm/yyyy',})
+    def get(self, date_1, date_2):
+        """ Retorna o update para uma data específica
 
-    if entry_of_interest.shape[0] == 0:
-        return make_response('Could not find the desired date', 404)
+            Deve ser feito no formato dia-mês-ano. Por exemplo /get_entry/01-04-2020_until_03_04_2020
 
-    return entry_of_interest.to_json()
+            Retorna um dicionário em formato JSON do tipo: {index -> {column -> value}}
 
-@app.route('/get_entry/<string:date_1>_until_<string:date_2>', methods=['GET'])
-def get_batch_of_updates(date_1, date_2):
-    """ Returns entry from an interval of dates
-    """  
+        """    
 
-    url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data.csv'
-    
-    df = pd.read_csv(url, error_bad_lines=False)
-    
-    entry_date_1 = df.loc[df.data == date_1]
-    entry_date_2 = df.loc[df.data == date_2]
+        url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data.csv'
+        
+        df = pd.read_csv(url, error_bad_lines=False)
+        
+        entry_date_1 = df.loc[df.data == date_1]
+        entry_date_2 = df.loc[df.data == date_2]
 
-    print(entry_date_1.shape,  entry_date_2.shape)
+        if (entry_date_1.shape[0] == 0) or (entry_date_2.shape[0] == 0):
+            return make_response('Pelo menos uma das datas não foi encontrada no dataset', 404)
 
-    if (entry_date_1.shape[0] == 0) or (entry_date_2.shape[0] == 0):
-        return make_response('One of the dates are wrong', 404)
+        entry_of_interest = df.iloc[entry_date_1.index[0]: entry_date_2.index[0], :]
 
-    entry_of_interest = df.iloc[entry_date_1.index[0]: entry_date_2.index[0], :]
+        return entry_of_interest.to_json()
 
-    return entry_of_interest.to_json()
+@name_space.route("/get_status")
+class GetStatus(Resource):
+    @app.doc(responses={ 200: 'Server is OK'})
 
-@app.route('/get_status/', methods=['GET'])
-def get_status():
-    """ Returns the status of server
-    """  
+    def get(self):
+        """ Retorna o Estado da API
+        """
 
-    status_code = make_response('Server_OK', 200)
-
-    return status_code
+        return {
+			"status": "Server is OK"
+		}
 
 if __name__ == '__main__':
-    app.run(port=5001, threaded=True, host='0.0.0.0')
+    flask_app.run(port=5001, threaded=True, host='0.0.0.0')
