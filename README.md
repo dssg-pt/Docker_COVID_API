@@ -1,39 +1,31 @@
 # Docker_COVID_API
 
-Tipos de requests possíveis até à data:
+**(STILL IN DEVELOPMENT) Not yet acessible**
 
-## /get_full_dataset
+Repo for deploying a REST API to get updates regarding Portuguese DGS COVID-19 data found in the following repo:
 
-Retorna um json com o dataset inteiro. O Json vem no formato:
+- [Dados relativos à pandemia COVID-19 em Portugal](https://github.com/dssg-pt/covid19pt-data)
 
-dict like {index -> {column -> value}}
+It is a combined effort between DSSG Portugal and VOST Portugal.
 
-## /get_status
+An initial version of this API is deployed in:
 
-Retorna um status de 200 se o servidor estiver online
+https://covid19-api.vost.pt/
 
-## /get_last_update
+The interactive documentation is presented in the previous page and it is documented in both portuguese and english.
 
-Retorna um json com a última entrada do dataset. O Json vem no formato:
+# 💡 Problems, inconsistencies and enhancements
 
-dict like {index -> {column -> value}}
+If you have any suggestion regarding the API or if you found a bug, please dot in via: ➡️ _Issues_ ou _Pull Requests_.
 
-## /get_entry/<string:date>
+# 🌍 About Data Science for Social Good Portugal
 
-Deve ser feito no formato dia-mês-ano. Por exemplo /get_entry/01-04-2020
+A [Data Science for Social Good Portugal](https://www.dssg.pt) Data Science for Social Good Portugal is a national non-profit organization of data-passionate professionals who use their skills to help generate a positive impact on the world.
 
-Retorna um json com a entrada da data pedida. O Json vem no formato:
+[@dssgPT](https://twitter.com/dssgpt) | [fb.com/DSSGPortugal](https://www.facebook.com/DSSGPortugal/) | [Instagram @dssg_pt](www.instagram.com/dssg_pt/) | [LinkedIn](https://www.linkedin.com/company/dssg-portugal)
 
-dict like {index -> {column -> value}}
+# 🌍 About VOST PT
 
-Caso não seja encontrada a data no dataset é retornado um erro.
+VOST Portugal's mission is real-time social network communication in emergencies such as adverse weather phenomena, natural disasters, and other scenarios where official, reliable, and validated information is of the utmost importance and can have a real impact in the security of citizens. Also they make use of a very strong technological component, which results in the development of large-scale solutions.
 
-## /get_entry/<string:date_1>_until_<string:date_2>
-
-Deve ser feito no formato dia-mês-ano. Por exemplo /get_entry/01-04-2020_until_05-04-2020
-
-Retorna um json com as entradas do intervado de dados pedido. O Json vem no formato:
-
-dict like {index -> {column -> value}}
-
-Caso não seja encontrada uma das datas no dataset é retornado um erro.
+[@vostpt](https://twitter.com/vostpt) | [VOST Portugal](https://www.facebook.com/Vostpt/) | [Instagram @vostpt](www.instagram.com/vostpt/) 
