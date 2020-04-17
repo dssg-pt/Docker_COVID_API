@@ -146,4 +146,4 @@ class GetStatus(Resource):
 		}
 
 if __name__ == '__main__':
-    flask_app.run(port=5000, threaded=True, debug=False, host='0.0.0.0')
+    flask_app.run(host='0.0.0.0')
