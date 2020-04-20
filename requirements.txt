@@ -1,5 +1,6 @@
 flask
-flask-restplus
+flask-restx
 pandas
 numpy
 werkzeug==0.16.1
+gunicorn

@@ -3,9 +3,10 @@ import pandas as pd
 # Get last update 
 from flask import Flask
 from flask import abort, make_response, request
-from flask_restplus import Api, Resource, fields
+from flask_restx import Api, Resource, fields
 
 flask_app = Flask(__name__)
+
 app = Api(app = flask_app,
           version = "1.0", 
 		  title = "COVID-19 REST API Portugal", 
@@ -131,4 +132,4 @@ class GetStatus(Resource):
 		}
 
 if __name__ == '__main__':
-    flask_app.run(port=5001, threaded=True, host='0.0.0.0')
+    flask_app.run(host='0.0.0.0')
