@@ -2,7 +2,7 @@ import pandas as pd
 
 # Get last update 
 from flask import Flask
-from flask import abort, make_response, request
+from flask import abort, make_response, request, Response
 from flask_restx import Api, Resource, fields
 
 flask_app = Flask(__name__)
@@ -12,7 +12,7 @@ app = Api(app = flask_app,
 		  title = "COVID-19 REST API Portugal", 
 		  description = "DSSG Portugal / VOST REST API para fazer Download dos dados da DGS correspondentes ao COVID-19")
 
-name_space = app.namespace('Requests', description='Request disponíveis até à data')
+name_space = app.namespace('Requests', description='Available Requests')
 
 @name_space.route('/get_last_update')
 class GetLastUpdate(Resource):
@@ -30,7 +30,11 @@ class GetLastUpdate(Resource):
         url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data.csv'
         df = pd.read_csv(url, error_bad_lines=False)
         last_date = df.iloc[-1]
-        return last_date.to_json()
+
+        resp = Response(response=last_date.to_json(),
+            status=200,
+            mimetype="application/json")
+        return(resp)
 
 
 @name_space.route('/get_full_dataset')
@@ -49,13 +53,17 @@ class GetFullDataset(Resource):
         
         url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data.csv'
         df = pd.read_csv(url, error_bad_lines=False)
-        return df.to_json()
+
+        resp = Response(response=df.to_json(),
+            status=200,
+            mimetype="application/json")
+        return(resp)
 
 @name_space.route('/get_entry/<string:date>')
 class GetSpecificDate(Resource):
     
     @app.doc(responses={ 200: 'OK', 500: 'Requested data was not found.' }, 
-			 params={ 'date': 'Specify the date in the format dd/mm/yyyy' })
+			 params={ 'date': 'Specify the date in the format dd-mm-yyyy' })
     def get(self, date):
         """ Returns the update of a specific date
 
@@ -80,14 +88,17 @@ class GetSpecificDate(Resource):
         if entry_of_interest.shape[0] == 0:
             name_space.abort(500, status = "Requested data was not found.", statusCode = "500")
 
-        return entry_of_interest.to_json()
+        resp = Response(response=entry_of_interest.to_json(),
+            status=200,
+            mimetype="application/json")
+        return(resp)
 
 @name_space.route('/get_entry/<string:date_1>_until_<string:date_2>')
 class GetRangeOfDates(Resource):
     
     @app.doc(responses={ 200: 'OK', 500: 'At least one of the dates was not found.' }, 
-			 params={ 'date_1': 'Specify the first date in the format dd/mm/yyyy',
-                      'date_2': 'Specify the first date in the format dd/mm/yyyy',})
+			 params={ 'date_1': 'Specify the first date in the format dd-mm-yyyy',
+                      'date_2': 'Specify the first date in the format dd-mm-yyyy',})
     def get(self, date_1, date_2):
         """ Returns the updates for a specific range of dates
 
@@ -115,7 +126,11 @@ class GetRangeOfDates(Resource):
 
         entry_of_interest = df.iloc[entry_date_1.index[0]: entry_date_2.index[0], :]
 
-        return entry_of_interest.to_json()
+        resp = Response(response=entry_of_interest.to_json(),
+            status=200,
+            mimetype="application/json")
+        return(resp)
+
 
 @name_space.route("/get_status")
 class GetStatus(Resource):
