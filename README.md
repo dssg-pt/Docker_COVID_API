@@ -1,14 +1,12 @@
 # Docker_COVID_API
 
-**(STILL IN DEVELOPMENT) Not yet acessible**
-
 Repo for deploying a REST API to get updates regarding Portuguese DGS COVID-19 data found in the following repo:
 
 - [Dados relativos à pandemia COVID-19 em Portugal](https://github.com/dssg-pt/covid19pt-data)
 
 It is a combined effort between DSSG Portugal and VOST Portugal.
 
-An initial version of this API is deployed in:
+API is deployed in:
 
 https://covid19-api.vost.pt/
 
