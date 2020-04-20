@@ -4,6 +4,7 @@ import pandas as pd
 from flask import Flask
 from flask import abort, make_response, request, Response
 from flask_restx import Api, Resource, fields
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 flask_app = Flask(__name__)
 
@@ -11,6 +12,8 @@ app = Api(app = flask_app,
           version = "1.0", 
 		  title = "COVID-19 REST API Portugal", 
 		  description = "DSSG Portugal / VOST REST API para fazer Download dos dados da DGS correspondentes ao COVID-19")
+
+flask_app.wsgi_app = ProxyFix(flask_app.wsgi_app)
 
 name_space = app.namespace('Requests', description='Available Requests')
 
