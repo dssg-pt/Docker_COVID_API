@@ -1,4 +1,4 @@
-# Docker_COVID_API
+# COVID-19 API
 
 Repo for deploying a REST API to get updates regarding Portuguese DGS COVID-19 data found in the following repo:
 
