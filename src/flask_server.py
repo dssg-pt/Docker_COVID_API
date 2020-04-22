@@ -111,7 +111,7 @@ class GetRangeOfDates(Resource):
 
             PT: Retorna o update para um intervalo de dados específico.
 
-            Deve ser feito no formato dd-mm-yyyy. Por exemplo /get_entry/01-04-2020_until_03_04_2020
+            Deve ser feito no formato dd-mm-yyyy. Por exemplo /get_entry/01-04-2020_until_03-04-2020
 
             Retorna um dicionário em formato JSON do tipo: {index -> {column -> value}}
 
