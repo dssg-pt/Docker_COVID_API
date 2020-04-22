@@ -11,7 +11,9 @@ flask_app = Flask(__name__)
 app = Api(app = flask_app,
           version = "1.0", 
 		  title = "COVID-19 REST API Portugal", 
-		  description = "DSSG Portugal / VOST REST API para fazer Download dos dados da DGS correspondentes ao COVID-19")
+		  description = "DSSG Portugal / VOST REST API for downloading DGS COVID-19 data",
+          license='MIT License',
+          license_url='https://github.com/dssg-pt/Docker_COVID_API/blob/master/LICENSE')
 
 flask_app.wsgi_app = ProxyFix(flask_app.wsgi_app)
 
