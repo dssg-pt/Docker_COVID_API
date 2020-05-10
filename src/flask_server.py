@@ -25,7 +25,7 @@ class GetLastUpdate(Resource):
     def get(self):
         """ Returns the last updated entry
 
-            Returns a dict with the following fomat: {index -> {column -> value}}
+            Returns a dict with the following format: {index -> {column -> value}}
 
             PT: Retorna o último update do dataset em formato JSON.
 
@@ -48,7 +48,7 @@ class GetFullDataset(Resource):
     def get(self):
         """ Returns the full dataset in a JSON format.
 
-            Returns a dict with the following fomat: {index -> {column -> value}}
+            Returns a dict with the following format: {index -> {column -> value}}
 
             PT: Retorna o dataset inteiro em formato JSON. 
 
@@ -74,7 +74,7 @@ class GetSpecificDate(Resource):
 
             Should be asked in the following format: dd-mm-yyyy. For example: /get_entry/01-04-2020
 
-            Returns a dict with the following fomat: {index -> {column -> value}}
+            Returns a dict with the following format: {index -> {column -> value}}
 
             PT: Retorna o update para uma data específica
 
@@ -109,7 +109,7 @@ class GetRangeOfDates(Resource):
 
             Should be asked in the following format: dd-mm-yyyy. For example: /get_entry/01-04-2020_until_05-04-2020
 
-            Returns a dict with the following fomat: {index -> {column -> value}}
+            Returns a dict with the following format: {index -> {column -> value}}
 
             PT: Retorna o update para um intervalo de dados específico.
 
