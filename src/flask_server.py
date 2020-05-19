@@ -136,6 +136,184 @@ class GetRangeOfDates(Resource):
             mimetype="application/json")
         return(resp)
 
+@name_space.route('/get_last_update_counties')
+class GetLastUpdateCounties(Resource):
+
+    def get(self):
+        """ Returns the last updated entry for all counties
+
+            Returns a dict with the following format: {index -> {column -> value}}
+
+            PT: Retorna o último update do dataset dos concelhos em formato JSON.
+
+            Retorna um dicionário em formato JSON do tipo: {index -> {column -> value}}
+    
+        """
+        url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data_concelhos.csv'
+        df = pd.read_csv(url, error_bad_lines=False)
+        last_date = df.iloc[-1]
+
+        resp = Response(response=last_date.to_json(),
+            status=200,
+            mimetype="application/json")
+        return(resp)
+
+@name_space.route('/get_entry_counties/<string:date>')
+class GetSpecificDateCounties(Resource):
+    
+    @app.doc(responses={ 200: 'OK', 500: 'Requested data was not found.' }, 
+			 params={ 'date': 'Specify the date in the format dd-mm-yyyy' })
+    def get(self, date):
+        """ Returns the update of a specific date for the counties dataset.
+
+            Should be asked in the following format: dd-mm-yyyy. For example: /get_entry_counties/01-04-2020
+
+            Returns a dict with the following format: {index -> {column -> value}}
+
+            PT: Retorna o update para uma data específica para o dataset dos concelhos
+
+            Deve ser feito no formato dd-mm-yyyy. Por exemplo /get_entry_counties/01-04-2020
+
+            Retorna um dicionário em formato JSON do tipo: {index -> {column -> value}}
+
+        """    
+
+        url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data_concelhos.csv'
+        
+        df = pd.read_csv(url, error_bad_lines=False)
+        
+        entry_of_interest = df.loc[df.data == date]
+
+        if entry_of_interest.shape[0] == 0:
+            name_space.abort(500, status = "Requested data was not found.", statusCode = "500")
+
+        resp = Response(response=entry_of_interest.to_json(),
+            status=200,
+            mimetype="application/json")
+        return(resp)
+
+@name_space.route('/get_entry_county/<string:date>_<string:county>')
+class GetSpecificDateSpecificCounty(Resource):
+    
+    @app.doc(responses={ 200: 'OK', 500: 'Requested data was not found.', 
+                         501: 'Requested county was not found.' }, 
+			 params={ 'date': 'Specify the date in the format dd-mm-yyyy',
+                      'county': 'Specify the county in UPPERCASE'})
+    def get(self, date, county):
+        """ Returns the update of a specific date for the desired county.
+
+            Should be asked in the following format: dd-mm-yyyy_UPPERCASECOUNTY. For example: /get_entry_county/01-04-2020_GONDOMAR
+
+            Returns a dict with the following format: {index -> {column -> value}}
+
+            PT: Retorna o update para uma data específica para um concelho específico.
+
+            Deve ser feito no formato dd-mm-yyyy_CONCELHO. Por exemplo /get_entry_county/01-04-2020_GONDOMAR
+
+            Retorna um dicionário em formato JSON do tipo: {index -> {column -> value}}
+
+        """    
+
+        url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data_concelhos.csv'
+        
+        df = pd.read_csv(url, error_bad_lines=False)
+        
+        entry_of_interest = df.loc[df.data == date]
+
+        if county not in df.columns:
+            name_space.abort(500, status = "Requested county was not found.", statusCode = "500")
+        else:
+            entry_of_interest = entry_of_interest[county]
+
+        if entry_of_interest.shape[0] == 0:
+            name_space.abort(501, status = "Requested data was not found.", statusCode = "500")
+
+        resp = Response(response=entry_of_interest.to_json(),
+            status=200,
+            mimetype="application/json")
+        return(resp)
+
+@name_space.route('/get_entry_counties/<string:date_1>_until_<string:date_2>')
+class GetRangeOfDatesCounties(Resource):
+    
+    @app.doc(responses={ 200: 'OK', 500: 'At least one of the dates was not found.' }, 
+			 params={ 'date_1': 'Specify the first date in the format dd-mm-yyyy',
+                      'date_2': 'Specify the first date in the format dd-mm-yyyy',})
+    def get(self, date_1, date_2):
+        """ Returns the updates for a specific range of dates for the counties dataset
+
+            Should be asked in the following format: dd-mm-yyyy. For example: /get_entry/01-04-2020_until_05-04-2020
+
+            Returns a dict with the following format: {index -> {column -> value}}
+
+            PT: Retorna o update para um intervalo de dados específico para o dataset dos concelhos
+
+            Deve ser feito no formato dd-mm-yyyy. Por exemplo /get_entry/01-04-2020_until_03-04-2020
+
+            Retorna um dicionário em formato JSON do tipo: {index -> {column -> value}}
+
+        """    
+
+        url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data_concelhos.csv'
+        
+        df = pd.read_csv(url, error_bad_lines=False)
+        
+        entry_date_1 = df.loc[df.data == date_1]
+        entry_date_2 = df.loc[df.data == date_2]
+
+        if (entry_date_1.shape[0] == 0) or (entry_date_2.shape[0] == 0):
+            return make_response('At least one of the dates was not found.', 404)
+
+        entry_of_interest = df.iloc[entry_date_1.index[0]: entry_date_2.index[0], :]
+
+        resp = Response(response=entry_of_interest.to_json(),
+            status=200,
+            mimetype="application/json")
+        return(resp)
+
+@name_space.route('/get_entry_county/<string:date_1>_until_<string:date_2>_<string:county>')
+class GetRangeOfDatesSpecificCounty(Resource):
+    
+    @app.doc(responses={ 200: 'OK', 500: 'At least one of the dates was not found.',
+                         501: 'Requested county was not found.' }, 
+			 params={ 'date_1': 'Specify the first date in the format dd-mm-yyyy',
+                      'date_2': 'Specify the first date in the format dd-mm-yyyy',
+                      'county': 'Specify the county in UPPERCASE'})
+    def get(self, date_1, date_2, county):
+        """ Returns the updates for a specific range of dates for the counties dataset
+
+            Should be asked in the following format: dd-mm-yyyy. The county should be in UPPERCASE. For example: /get_entry/01-04-2020_until_05-04-2020_GONDOMAR
+
+            Returns a dict with the following format: {index -> {column -> value}}
+
+            PT: Retorna o update para um intervalo de dados específico para o dataset dos concelhos
+
+            Deve ser feito no formato dd-mm-yyyy. O concelho deve ser pedido em maiúsculas. Por exemplo /get_entry/01-04-2020_until_03-04-2020_GONDOMAR
+
+            Retorna um dicionário em formato JSON do tipo: {index -> {column -> value}}
+        """    
+
+        url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data_concelhos.csv'
+        
+        df = pd.read_csv(url, error_bad_lines=False)
+        
+        entry_date_1 = df.loc[df.data == date_1]
+        entry_date_2 = df.loc[df.data == date_2]
+
+        if (entry_date_1.shape[0] == 0) or (entry_date_2.shape[0] == 0):
+            return make_response('At least one of the dates was not found.', 404)
+
+        entry_of_interest = df.iloc[entry_date_1.index[0]: entry_date_2.index[0], :]
+
+        if county not in df.columns:
+            name_space.abort(501, status = "Requested county was not found.", statusCode = "500")
+        else:
+            entry_of_interest = entry_of_interest[county]
+
+        resp = Response(response=entry_of_interest.to_json(),
+            status=200,
+            mimetype="application/json")
+        return(resp)
 
 @name_space.route("/get_status")
 class GetStatus(Resource):
