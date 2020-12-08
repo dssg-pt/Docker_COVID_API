@@ -135,6 +135,8 @@ class GetRangeOfDates(Resource):
             status=200,
             mimetype="application/json")
         return(resp)
+        
+## COUNTIES 
 
 @name_space.route('/get_last_update_counties')
 class GetLastUpdateCounties(Resource):
@@ -149,11 +151,37 @@ class GetLastUpdateCounties(Resource):
             Retorna um dicionário em formato JSON do tipo: {index -> {column -> value}}
     
         """
-        url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data_concelhos.csv'
+        url = 'https://github.com/dssg-pt/covid19pt-data/blob/master/data_concelhos_new.csv'
         df = pd.read_csv(url, error_bad_lines=False)
         last_date = df.iloc[-1]
 
         resp = Response(response=last_date.to_json(),
+            status=200,
+            mimetype="application/json")
+        return(resp)
+
+@name_space.route('/get_last_update_specific_county/<string:county>')
+class GetLastUpdateSpecificCounty(Resource):
+
+    def get(self, county):
+        """ Returns the last updated entry for a specific county.
+
+            Returns a dict with the following format: {index -> {column -> value}}
+
+            PT: Retorna o último update do dataset dos concelhos em formato JSON.
+
+            Retorna um dicionário em formato JSON do tipo: {index -> {column -> value}}
+    
+        """
+        url = 'https://github.com/dssg-pt/covid19pt-data/blob/master/data_concelhos_new.csv'
+        df = pd.read_csv(url, error_bad_lines=False)
+        last_date = df.iloc[-1]
+        specific_county = last_date[last_date['concelho'] == county.upper()]
+        
+        if len(specific_county) == 0:
+            name_space.abort(500, status = "Requested county was not found.", statusCode = "500")
+
+        resp = Response(response=specific_county.to_json(),
             status=200,
             mimetype="application/json")
         return(resp)
@@ -177,8 +205,7 @@ class GetSpecificDateCounties(Resource):
             Retorna um dicionário em formato JSON do tipo: {index -> {column -> value}}
 
         """    
-
-        url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data_concelhos.csv'
+        url = 'https://github.com/dssg-pt/covid19pt-data/blob/master/data_concelhos_new.csv'
         
         df = pd.read_csv(url, error_bad_lines=False)
         
@@ -214,16 +241,14 @@ class GetSpecificDateSpecificCounty(Resource):
 
         """    
 
-        url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data_concelhos.csv'
+        url = 'https://github.com/dssg-pt/covid19pt-data/blob/master/data_concelhos_new.csv'
         
         df = pd.read_csv(url, error_bad_lines=False)
         
         entry_of_interest = df.loc[df.data == date]
 
-        if county not in df.columns:
+        if len(entry_of_interest) == 0:
             name_space.abort(500, status = "Requested county was not found.", statusCode = "500")
-        else:
-            entry_of_interest = entry_of_interest[county]
 
         if entry_of_interest.shape[0] == 0:
             name_space.abort(501, status = "Requested data was not found.", statusCode = "500")
@@ -254,7 +279,7 @@ class GetRangeOfDatesCounties(Resource):
 
         """    
 
-        url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data_concelhos.csv'
+        url = 'https://github.com/dssg-pt/covid19pt-data/blob/master/data_concelhos_new.csv'
         
         df = pd.read_csv(url, error_bad_lines=False)
         
@@ -293,7 +318,7 @@ class GetRangeOfDatesSpecificCounty(Resource):
             Retorna um dicionário em formato JSON do tipo: {index -> {column -> value}}
         """    
 
-        url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data_concelhos.csv'
+        url = 'https://github.com/dssg-pt/covid19pt-data/blob/master/data_concelhos_new.csv'
         
         df = pd.read_csv(url, error_bad_lines=False)
         
@@ -304,11 +329,10 @@ class GetRangeOfDatesSpecificCounty(Resource):
             return make_response('At least one of the dates was not found.', 404)
 
         entry_of_interest = df.iloc[entry_date_1.index[0]: entry_date_2.index[0], :]
-
-        if county not in df.columns:
-            name_space.abort(501, status = "Requested county was not found.", statusCode = "500")
-        else:
-            entry_of_interest = entry_of_interest[county]
+        entry_of_interest = entry_of_interest[county]
+        
+        if len(entry_of_interest) == 0:
+            name_space.abort(500, status = "Requested county was not found.", statusCode = "500")
 
         resp = Response(response=entry_of_interest.to_json(),
             status=200,
