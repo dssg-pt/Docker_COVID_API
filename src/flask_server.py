@@ -10,7 +10,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 flask_app = Flask(__name__)
 
 app = Api(app = flask_app,
-          version = "1.0", 
+          version = "2.0", 
 		  title = "COVID-19 REST API Portugal", 
 		  description = "DSSG Portugal / VOST REST API for downloading DGS COVID-19 data",
           license='MIT License',
