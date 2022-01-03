@@ -123,9 +123,16 @@ class GetRangeOfDates(Resource):
         url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data.csv'
         
         df = pd.read_csv(url, error_bad_lines=False)
-        
-        entry_date_1 = df.loc[df.data == date_1]
-        entry_date_2 = df.loc[df.data == date_2]
+        df['data'] = pd.to_datetime(df['data'])
+
+        range = pd.DataFrame({'data': [date_1, date_2]})
+        range['data'] = pd.to_datetime(range['data'])
+
+        start_date = range.iloc[0]['data']
+        end_date = range.iloc[1]['data']
+
+        entry_date_1 = df.loc[df.data == start_date]
+        entry_date_2 = df.loc[df.data == end_date]
 
         if (entry_date_1.shape[0] == 0) or (entry_date_2.shape[0] == 0):
             return make_response('At least one of the dates was not found.', 404)
@@ -242,9 +249,16 @@ class GetRangeOfDatesCounties(Resource):
         url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data_concelhos_new.csv'
 
         df = pd.read_csv(url, error_bad_lines=False)
-        
+        df['data'] = pd.to_datetime(df['data'])
+
+        range = pd.DataFrame({'data': [date_1, date_2]})
+        range['data'] = pd.to_datetime(range['data'])
+
+        start_date = range.iloc[0]['data']
+        end_date = range.iloc[1]['data']
+
         entry_of_interest = df.loc[
-            (df.data >= date_1) & (df.data <= date_2)
+            (df.data >= start_date) & (df.data <= end_date)
         ]
 
         if len(entry_of_interest) == 0:
@@ -281,15 +295,22 @@ class GetRangeOfDatesSpecificCounty(Resource):
         url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data_concelhos_new.csv'
         
         df = pd.read_csv(url, error_bad_lines=False)
-        
+        df['data'] = pd.to_datetime(df['data'])
+
+        range = pd.DataFrame({'data': [date_1, date_2]})
+        range['data'] = pd.to_datetime(range['data'])
+
+        start_date = range.iloc[0]['data']
+        end_date = range.iloc[1]['data']
+
         entry_of_interest = df.loc[
-            (df.data >= date_1) & (df.data <= date_2)
+            (df.data >= start_date) & (df.data <= end_date)
         ]
 
         if len(entry_of_interest) == 0:
             return make_response('At least one of the dates was not found.', 404)
 
-        entry_of_interest = entry_of_interest[entry_of_interest.concelho == county]
+        entry_of_interest = entry_of_interest[entry_of_interest.concelho == county.upper()]
         
         if len(entry_of_interest) == 0:
             name_space.abort(500, status = "Requested county was not found.", statusCode = "500")
