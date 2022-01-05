@@ -26,7 +26,7 @@ A username and password will be generated and sent to you by email.
 """
 
 app = Api(app = flask_app,
-          version = "2.0", 
+          version = "3.0", 
 		  title = "COVID-19 REST API Portugal", 
 		  description = desc,
           license='MIT License',
