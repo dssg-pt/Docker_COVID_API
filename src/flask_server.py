@@ -28,7 +28,7 @@ A username and password will be generated and sent to you by email.
 app = Api(app = flask_app,
           version = "3.0", 
 		  title = "COVID-19 REST API Portugal", 
-		  description = desc,
+		  description = desc_str,
           license='MIT License',
           license_url='https://github.com/dssg-pt/Docker_COVID_API/blob/master/LICENSE')
 
@@ -123,32 +123,19 @@ class GetRangeOfDates(Resource):
                       'date_2': 'Specify the first date in the format dd-mm-yyyy',})
     def get(self, date_1, date_2):
         """ Returns the updates for a specific range of dates
-
             Should be asked in the following format: dd-mm-yyyy. For example: /get_entry/01-04-2020_until_05-04-2020
-
             Returns a dict with the following format: {index -> {column -> value}}
-
             PT: Retorna o update para um intervalo de dados específico.
-
             Deve ser feito no formato dd-mm-yyyy. Por exemplo /get_entry/01-04-2020_until_03-04-2020
-
             Retorna um dicionário em formato JSON do tipo: {index -> {column -> value}}
-
         """    
 
         url = 'https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data.csv'
         
         df = pd.read_csv(url, error_bad_lines=False)
-        df['data'] = pd.to_datetime(df['data'])
-
-        range = pd.DataFrame({'data': [date_1, date_2]})
-        range['data'] = pd.to_datetime(range['data'])
-
-        start_date = range.iloc[0]['data']
-        end_date = range.iloc[1]['data']
-
-        entry_date_1 = df.loc[df.data == start_date]
-        entry_date_2 = df.loc[df.data == end_date]
+        
+        entry_date_1 = df.loc[df.data == date_1]
+        entry_date_2 = df.loc[df.data == date_2]
 
         if (entry_date_1.shape[0] == 0) or (entry_date_2.shape[0] == 0):
             return make_response('At least one of the dates was not found.', 404)
@@ -279,7 +266,10 @@ class GetRangeOfDatesCounties(Resource):
 
         if len(entry_of_interest) == 0:
             return make_response('At least one of the dates was not found.', 404)
-
+	
+	entry_of_interest = entry_of_interest.sort_values(by=['data'])
+        entry_of_interest['data'] = entry_of_interest['data'].dt.strftime('%d-%m-%Y')
+	
         resp = Response(response=entry_of_interest.to_json(orient='records'),
             status=200,
             mimetype="application/json")
@@ -330,7 +320,10 @@ class GetRangeOfDatesSpecificCounty(Resource):
         
         if len(entry_of_interest) == 0:
             name_space.abort(500, status = "Requested county was not found.", statusCode = "500")
-
+	
+	entry_of_interest = entry_of_interest.sort_values(by=['data'])
+        entry_of_interest['data'] = entry_of_interest['data'].dt.strftime('%d-%m-%Y')
+	
         resp = Response(response=entry_of_interest.to_json(orient='records'),
             status=200,
             mimetype="application/json")
