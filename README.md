@@ -18,9 +18,11 @@ Due to recurrent abuse in the usage of the API, including but not limited to the
 
 All users should request their pwd by sending an email to covidapi@vost.pt with the following information :
 
-**Website where the API and data are being used
-contact email:
-Name of the person responsible:**
+**Website where the API and data are being used**
+
+**Contact email:**
+
+**Name of the person responsible:**
 
 A username and password will be generated and sent to you by email.
 
