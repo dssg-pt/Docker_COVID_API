@@ -9,10 +9,26 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 flask_app = Flask(__name__)
 
+desc_str = """
+DSSG Portugal / VOST REST API for downloading DGS COVID-19 data.
+
+Due to recurrent abuse in the usage of the API, including but not limited to the attribution required by the license, the API now requires basic auth
+
+All users should request their pwd by sending an email to covidapi@vost.pt with the following information :
+
+Website where the API and data are being used
+
+Contact email:
+
+Name of the person responsible:
+
+A username and password will be generated and sent to you by email.
+"""
+
 app = Api(app = flask_app,
           version = "2.0", 
 		  title = "COVID-19 REST API Portugal", 
-		  description = "DSSG Portugal / VOST REST API for downloading DGS COVID-19 data",
+		  description = desc,
           license='MIT License',
           license_url='https://github.com/dssg-pt/Docker_COVID_API/blob/master/LICENSE')
 
