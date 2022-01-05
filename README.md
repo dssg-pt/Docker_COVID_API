@@ -12,6 +12,18 @@ https://covid19-api.vost.pt/
 
 The interactive documentation is presented in the previous page and it is documented in both portuguese and english.
 
+# Password access
+
+Due to recurrent abuse in the usage of the API, including but not limited to the attribution required by the license, the API now requires basic auth
+
+All users should request their pwd by sending an email to covidapi@vost.pt with the following information :
+
+**Website where the API and data are being used
+contact email:
+Name of the person responsible:**
+
+A username and password will be generated and sent to you by email.
+
 # 💡 Problems, inconsistencies and enhancements
 
 If you have any suggestion regarding the API or if you found a bug, please dot in via: ➡️ _Issues_ ou _Pull Requests_.
