@@ -266,13 +266,14 @@ class GetRangeOfDatesCounties(Resource):
 
         if len(entry_of_interest) == 0:
             return make_response('At least one of the dates was not found.', 404)
-	
-	entry_of_interest = entry_of_interest.sort_values(by=['data'])
+
+        entry_of_interest = entry_of_interest.sort_values(by=['data'])
         entry_of_interest['data'] = entry_of_interest['data'].dt.strftime('%d-%m-%Y')
-	
+
         resp = Response(response=entry_of_interest.to_json(orient='records'),
             status=200,
             mimetype="application/json")
+            
         return(resp)
 
 
@@ -320,10 +321,11 @@ class GetRangeOfDatesSpecificCounty(Resource):
         
         if len(entry_of_interest) == 0:
             name_space.abort(500, status = "Requested county was not found.", statusCode = "500")
-	
-	entry_of_interest = entry_of_interest.sort_values(by=['data'])
+
+        entry_of_interest = entry_of_interest.sort_values(by=['data'])
+
         entry_of_interest['data'] = entry_of_interest['data'].dt.strftime('%d-%m-%Y')
-	
+
         resp = Response(response=entry_of_interest.to_json(orient='records'),
             status=200,
             mimetype="application/json")
@@ -364,8 +366,8 @@ class GetStatus(Resource):
         """
 
         return {
-			"status": "Server is OK"
-		}
+            "status": "Server is OK"
+        }
 
 if __name__ == '__main__':
     flask_app.run(host='0.0.0.0')
